@@ -3,9 +3,8 @@ package com.codegym.games.spaceinvaders.gameobjects;
 import com.codegym.games.spaceinvaders.Direction;
 import com.codegym.games.spaceinvaders.ShapeMatrix;
 
-public class EnemyShip extends Ship{
-    public double x;
-    public double y;
+public class EnemyShip extends Ship {
+    public int score = 15;
 
     public EnemyShip(double x, double y) {
         super(x, y);
@@ -13,15 +12,36 @@ public class EnemyShip extends Ship{
     }
 
     public void move(Direction direction, double speed) {
-        switch(direction) {
+        switch (direction) {
             case RIGHT:
-                x+=speed;
+                x = x + speed;
+                break;
             case LEFT:
-                x-= speed;
+                x = x - speed;
+                break;
             case DOWN:
-                y+=2;
-            case UP:
-                y-=2;
+                y += 2;
+                break;
+            default:
+                break;
         }
+    }
+
+    @Override
+    public Bullet fire() {
+        return new Bullet(x + 1, y + height, Direction.DOWN);
+    }
+
+    @Override
+    public void kill() {
+        if (!isAlive) {
+            return;
+        }
+        isAlive = false;
+
+        this.setAnimatedView(false,
+                ShapeMatrix.KILL_ENEMY_ANIMATION_FIRST,
+                ShapeMatrix.KILL_ENEMY_ANIMATION_SECOND,
+                ShapeMatrix.KILL_ENEMY_ANIMATION_THIRD);
     }
 }

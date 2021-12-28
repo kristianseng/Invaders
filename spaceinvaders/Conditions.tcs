@@ -1,81 +1,67 @@
-taskKey="com.codegym.games.spaceinvaders.part09"\n\nSpace Invaders (Part 9/34)
+taskKey="com.codegym.games.spaceinvaders.part33"\n\nSpace Invaders (Part 33/34)
 
-Everything will move in the game, which means that we need to specify the direction in which objects are moving. It is convenient to store directions in an enum.
-We&#39;ll describe the motion of an enemy ship in the move() method. The method will change the appropriate coordinate depending on direction and speed.
-The downward speed will be a constant 2. Because the enemy fleet moves back and forth between edges of the playing field, we need to watch for when the fleet reaches the edges.
+At this stage, we&#39;ll add scorekeeping to the game. The player gets 15 points for each ordinary ship and 100 points for the boss.
+It will be most convenient to keep score in the checkHit() method, after reworking it a little.
+To store the total score, we&#39;ll add a score variable in the SpaceInvadersGame class. We&#39;ll display it on the screen using the Game class&#39;s setScore method.
 
 
 Требования:
-1.	There must be a public Direction enum with the following values in a separate file: RIGHT, LEFT, UP, DOWN.
-2.	The EnemyShip class must have a public void move(Direction direction, double speed) method.
-3.	In the move(Direction direction, double speed) method, you need to increase the x field by speed if direction is equal to Direction.RIGHT.
-4.	In the move(Direction direction, double speed) method, you need to decrease the x field by speed if direction is equal to Direction.LEFT.
-5.	In the move(Direction direction, double speed) method, you need to increase the y field by 2 if direction is equal to Direction.DOWN.
-6.	The EnemyFleet class must have a private double getLeftBorder() method.
-7.	The getLeftBorder() method must return the smallest x coordinate of all of the enemy ships in the ships list.
-8.	The EnemyFleet class must have a private double getRightBorder() method.
-9.	The getRightBorder() method must return the largest (x + width) value of all of the enemy ships in the ships list.
+1.	The EnemyShip class must have a public int score field that is initialized to 15 when it is declared.
+2.	The Boss class&#39;s constructor must set the score field to 100.
+3.	The EnemyFleet class must have a public int checkHit(List&lt;Bullet&gt; bullets) method.
+4.	The EnemyFleet class must not have a public void checkHit(List&lt;Bullet&gt; bullets) method.
+5.	The checkHit(List&lt;Bullet&gt; bullets) method must return 0 if the bullets list is empty.
+6.	The checkHit(List&lt;Bullet&gt; bullets) method must return the sum of the values of the score fields of all of the objects in the ships list on which the kill() method is called.
+7.	There must be a private int score field in the SpaceInvadersGame class.
+8.	The score field must be initialized to 0 in the createGame() method.
+9.	The onTurn(int) method must call the setScore(int) method with score as the argument.
+10.	In the onTurn(int) method, the setScore(int) method must be called before the drawScene() method.
+11.	In the check() method, the score field must be increased by the value returned by calling the checkHit(List&lt;Bullet&gt;) method on the enemyFleet object.
 
 
-Space Invaders (Part 9/34)
+Space Invaders (Part 33/34)
 
-Let&#39;s continue working on the enemy fleet. To do this, we need to fill the ships list in the createShips() method.
-Keep in mind that the best distance from the top of the screen to the top row of ships is 12 cells.
-To add the enemy fleet to the game, we&#39;ll create an enemyFleet field in the SpaceInvadersGame class and initialize it to a new EnemyFleet object.
-The enemy ships are created when the createShips method is called in the EnemyFleet constructor.
-The game is dynamic, so we&#39;ll need to regularly redraw the screen and perform other actions. Everything that happens at each step is performed in the onTurn(int) method.
-We&#39;ll use the setTurnTimer method to set how often this method is called. It takes an argument that determines how long each step is in milliseconds.
-In other words, given a step of 40 ms (0.04 second), the onTurn method will be called 25 times per second (1 / 0.04 second).
-If you&#39;ve done everything correctly, you&#39;ll see the enemy fleet when you run the program.
-
-
-
-Space Invaders (Part 9/34)
-
-In this part of the project, we&#39;ll prepare the foundation for the enemy fleet. To do this, we&#39;ll create an EnemyFleet class.
-It will store the list of ships, number of rows of ships (ROWS_COUNT), number of ships per row (COLUMNS_COUNT),
-and distance between left corners of adjacent ships (STEP). We&#39;ll create the ships and add them to the ships list in the createShips method,
-which we will implement later.
+The game is lost not only if the player&#39;s ship is destroyed, but also if the enemy fleet reaches the player&#39;s ship.
+To determine the coordinates of the lower edge of the enemy fleet, we&#39;ll add a getBottomBorder() method.
+If all the enemies are destroyed, the player wins. For convenience, we&#39;ll add a getShipCount(), method that will return the number of ships remaining in the enemy fleet.
+If the number is 0, you need to call the stopGameWithDelay() method and call the win() method on the playerShip object.
+This method replaces the player&#39;s ship matrix with ShapeMatrix.WIN_PLAYER.
+We&#39;ll check the number of ships remaining in the enemy fleet and whether they have reached the player&#39;s ship in the check() method.
 
 
 
-Space Invaders (Part 9/34)
+Space Invaders (Part 33/34)
 
-Now we&#39;ll create a Ship class that will store properties that all spaceships share. It will have a setStaticView method that at present will set a matrix.
-Later, it will set an animation. First, we make a class for ships in the enemy&#39;s fleet: EnemyShip. We&#39;ve provided its matrix for you in the ShapeMatrix class.
-
-
-
-Space Invaders (Part 9/34)
-
-Stars aren&#39;t the only objects in this game. We will also need spaceships, of course! A game object&#39;s appearance is determined by a matrix,
-so we&#39;ll add a matrix field to the GameObject class. In addition to the object&#39;s outline, the matrix contains the ordinals of colors
-in the com.codegym.engine.cell.Color enum. We&#39;ll put the object&#39;s dimensions into separate width and height fields. To draw a game object on the screen,
-we&#39;ll create a draw(Game game) method. For each cell in the matrix, we&#39;ll have this method call the setCellValueEx(int x, int y, Color color, String text)
-method on the Game object passed to it as an argument. To draw the matrix on the playing field, we need to consider the x and y coordinates of the GameObject object.
-These coordinates are the coordinates of the upper left cell of the matrix on the playing field.
-
-For example:
-
-
-As you can see from the example, the upper left corner of the game object&#39;s matrix has coordinates x = 2 and y = 4 on the playing field.
-However, relative to its own matrix, these coordinates are x = 0 and y = 0. Accordingly, the setCellValueEx method will be passed the coordinates
-of the upper left corner of the game object&#39;s matrix on the playing field + the coordinates of the cell within the game object&#39;s matrix (x = 2 + 0, y = 4 + 0).
-
-For example:
-game.setCellValueEx(x of the object on the playing field + x in the matrix, y of the object on the playing field + y in the matrix, color, empty string);
-Note that color is the color of the cell in the object&#39;s matrix. You can get it like this: Color.values()[matrix[i][j]],
-where i is the y coordinate in matrix and j is the x coordinate in matrix.
+Let&#39;s make the boss animate continuously. To do this, we need to give the setAnimatedView method an isLoopAnimation parameter responsible
+for indicating whether the animation should loop. This parameter is used to properly set the loopAnimation field.
+If the loopAnimation field is true, the nextFrame method repeats the frames by resetting frameIndex.
+As a result, you need to refactor the parameters in places where the setAnimatedView method is called.
 
 
 
-Space Invaders (Part 9/34)
+Space Invaders (Part 33/34)
 
-We can use any Unicode symbol to represent stars. We&#39;ll store it in the Star class&#39;s STAR_SIGN field.
-To draw stars on the playing field, we&#39;ll create a draw(Game) method. We&#39;ll have it call the setCellValueEx method on the Game object passed to it as an argument.
-We&#39;ll pass the star&#39;s coordinates, background color, symbol, color, and size to the setCellValueEx method. Note that the star&#39;s x and y coordinates are doubles,
-so you need to convert them to int when calling the setCellValueEx method. To add stars to the game, we&#39;ll create a list of stars and a method that will fill
-the list with new stars. And to draw the stars on the playing field, you need to call the draw(Game) method on each star after drawing the playing field.
+Now we&#39;ll teach the boss to shoot. Depending on the animation frame, the boss will shoot from different cannons.
+We&#39;ll also override the kill() method, where we&#39;ll set the value of the isAlive field and set the frames of the explosion animation.
+
+
+
+Space Invaders (Part 33/34)
+
+It&#39;s time to create the enemy boss. To make him look tougher, we&#39;ll add an animation when he moves.
+If the animation changes with every step, it will move too quickly.
+To create the desired effect, you need to change the frame once every 10 steps.
+That&#39;s why we need to override the nextFrame method and add a frameCount variable that will count steps.
+
+
+
+Space Invaders (Part 33/34)
+
+At this stage, we&#39;ll add a checkHit(List&lt;Bullet&gt; bullets) method for checking whether the player&#39;s projectile has hit an enemy ship.
+After a hit, we need to &quot;kill&quot; the corresponding projectile and enemy ship. Additionally, we&#39;ll add a deleteHiddenShips()
+method that will remove &quot;hidden&quot; ships from the list. To remove the ships, you can either use an iterator, or create a copy of the ships list
+and run through it in a loop. If we determine that a ship needs to be removed, we&#39;ll call ships.remove(ship).
+The checkHit(List&lt;Bullet&gt; bullets) and deleteHiddenShips() methods must be called in the SpaceInvadersGame class&#39;s check() method.
 
 
 
