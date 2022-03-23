@@ -1,4 +1,4 @@
-# Invaders space game
+# Invaders game
 
 
 
@@ -6,11 +6,11 @@
 
 
 
-<img src="invaders.gif" width="400" height="500"/>
+<img src="invaders.gif" width="250" height="400"/>
 
 
 
 
-# Acknowledgments
+### Acknowledgments
 desktop-game-engine.jar developed by codegym developers
 
